@@ -1,0 +1,53 @@
+@startuml
+skinparam componentStyle uml2
+
+actor Менеджер as Manager
+actor Клиент as Client
+
+package "Admin panel" as Admin {
+    component "[Nginx]" as AdminNginx <<Web>>
+    component "[Django]" as AdminApp <<Application>>
+    database "[Postgres]" as AdminPostgres <<Storage>>
+
+    AdminPostgres <-down- AdminApp
+    AdminApp <-down- AdminNginx
+
+}
+
+package "ETL" as ETL {
+    component "[ETL]" as ETLApp <<Application>>
+}
+
+package "Async API" as AsyncAPI {
+    component "[Nginx]" as AsyncNginx <<Web>>
+    component "[FastAPI]" as AsyncApp <<Application>>
+    database "[Elasticsearch]" as Elasticsearch <<Storage>>
+    database "[Redis]" as AsyncRedis <<Cache>>
+
+    Elasticsearch <-- AsyncApp
+    AsyncApp -up-> AsyncRedis
+    AsyncApp <-down- AsyncNginx
+}
+
+package "Auth API" as AuthAPI{
+    component "[Nginx]" as AuthNginx <<Web>>
+    component "[Flask]" as AuthApp <<Application>>
+    database "[Postgres]" as AuthPostgres <<Storage>>
+    database "[Redis]" as AuthRedis <<Storage>>
+
+    AuthPostgres <-- AuthApp
+    AuthApp -up-> AuthRedis
+    AuthApp <-down- AuthNginx
+
+}
+
+AdminPostgres <-down-- ETLApp
+ETLApp --up-> Elasticsearch
+
+AsyncApp --> AuthNginx
+
+Client -up-> AuthNginx
+Client -up-> AsyncNginx
+
+AdminNginx <-- Manager
+@enduml
