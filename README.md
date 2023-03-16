@@ -9,7 +9,7 @@
 
 <details><summary><b>TO BE</b></summary>
 
-В работе...
+![Архитектура TO BE](https://github.com/georotor/ugc_sprint_1/blob/main/docs/to_be.png?raw=true)
 
 </details>
 
