@@ -7,7 +7,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import decode
 
 from core.config import settings
-from db.redis import redis
+from db import redis
 
 
 class JWTBearer(HTTPBearer):
@@ -20,10 +20,7 @@ class JWTBearer(HTTPBearer):
             if not credentials.scheme == "Bearer":
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid authentication scheme.")
 
-            payload = await self.verify_jwt(credentials.credentials)
-            if not payload:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token or expired token.")
-
+            payload = await self.get_payload(credentials.credentials)
             check_auth = await self.check_auth(token=credentials.credentials, payload=payload)
             if not check_auth:
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Auth: Invalid token or expired token.")
@@ -34,7 +31,20 @@ class JWTBearer(HTTPBearer):
 
     @staticmethod
     async def get_payload(token: str) -> dict:
-        return decode(token, options={"verify_signature": False})
+        """
+        Если токен валидный и не истек срок его действия, то возвращает данные токена
+
+        :param token: Токен для проверки
+        :return: Данные из токена в виде словаря
+        """
+        try:
+            payload = decode(token, options={"verify_signature": False})
+            if payload.get("exp") > datetime.now(timezone.utc).timestamp():
+                return payload
+        except:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token.")
+
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Expired token.")
 
     async def check_auth(self, token: str, payload: dict) -> bool:
         """
@@ -56,32 +66,16 @@ class JWTBearer(HTTPBearer):
         async with session.get(settings.auth_url, headers={'Authorization': f'Bearer {token}'}) as auth_response:
             if auth_response.status == status.HTTP_200_OK:
                 res = True
-            await self._put_jwt_to_cache(payload, res)
 
+            await self._put_jwt_to_cache(payload, res)
             return res
 
-    async def verify_jwt(self, token: str) -> dict | bool:
-        """
-        Проверяет что в токене есть данные и его срок годности не истек
-
-        :param token: Токен для проверки
-        :return: Данные из токена в виде словаря или False
-        """
-        try:
-            payload = await self.get_payload(token)
-            if payload.get("exp") > datetime.now(timezone.utc).timestamp():
-                return payload
-        except:
-            return False
-
-        return False
-
     async def _jwt_from_cache(self, jti: UUID) -> bool:
-        return await redis.get(str(jti))
+        return await redis.client.get(str(jti))
 
     async def _put_jwt_to_cache(self, payload: dict, value: bool):
         ex = settings.cache_expire
         if payload.get("exp") - datetime.now(timezone.utc).timestamp() < ex:
             ex = payload.get("exp") - datetime.now(timezone.utc).timestamp()
 
-        await redis.set(payload.get('jti'), int(value), ex)
+        await redis.client.set(payload.get('jti'), int(value), ex)

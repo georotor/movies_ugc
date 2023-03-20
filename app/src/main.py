@@ -22,7 +22,7 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
-    redis.redis = await aioredis.from_url(
+    redis.client = await aioredis.from_url(
         f"redis://{settings.redis_host}:{settings.redis_port}",
         encoding="utf8",
         decode_responses=True,
@@ -32,7 +32,7 @@ async def startup():
 
 @app.on_event("shutdown")
 async def shutdown():
-    await redis.redis.close()
+    await redis.client.close()
 
 
 app.include_router(events.router, prefix="/api/v1/events", tags=["events"])
