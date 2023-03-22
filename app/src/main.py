@@ -2,13 +2,14 @@ from logging import config as logging_config
 
 import redis.asyncio as aioredis
 import uvicorn
+from aiokafka import AIOKafkaProducer
 from fastapi import FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
 
 from api.v1 import events
 from core.config import settings
 from core.logger import LOGGING
-from db import redis
+from db import redis, kafka
 
 logging_config.dictConfig(LOGGING)
 
@@ -28,11 +29,16 @@ async def startup():
         decode_responses=True,
         max_connections=20,
     )
+    kafka.producer = AIOKafkaProducer(
+        bootstrap_servers=f'{settings.kafka_host}:{settings.kafka_port}',
+        max_batch_size=1024
+    )
 
 
 @app.on_event("shutdown")
 async def shutdown():
     await redis.client.close()
+    await kafka.producer.stop()
 
 
 app.include_router(events.router, prefix="/api/v1/events", tags=["events"])
