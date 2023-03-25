@@ -19,9 +19,8 @@ ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 
-
 def calculate_average(
-        func: Callable, data: list[list[Any]], logger=logger
+        func: Callable, data: list[list[Any]], round_to: int = 5, logger=logger
 ) -> float:
     """Запускает функцию несколько раз и возвращает среднее время работы.
     Данные, которые возвращала оригинальная функция, при этом игнорируются.
@@ -29,6 +28,7 @@ def calculate_average(
     Args:
       func: функция (метод) для запуска;
       data: список из списка аргументов для каждого запуска;
+      round_to: округление до n знаков после запятой;
       logger: логгер, рекомендованные уровни - DEBUG для StreamHandler и
       INFO для FileHandler.
 
@@ -43,7 +43,7 @@ def calculate_average(
             '   - {}: {} seconds'.format(func.__name__, result_time)
         )
 
-    average = sum(result) / len(result)
+    average = round(sum(result) / len(result), round_to)
     logger.info(
         ' - тест: {}, попыток: {}, среднее время: {}'.format(
             func.__name__, len(result), average
