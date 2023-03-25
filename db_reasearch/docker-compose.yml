@@ -3,33 +3,37 @@ services:
     image: jbfavre/vertica:9.2.0-7_debian-8
     container_name: vertica
     hostname: vertica
-    restart: always
     ports:
       - "5433:5433"
     volumes:
-      - .:/vertica
+      - vertica_data:/usr/share/vertica
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 2G
+          cpus: '4'
+          memory: 4G
         reservations:
-          cpus: '2'
-          memory: 2G
+          cpus: '4'
+          memory: 4G
 
   clickhouse:
     image: yandex/clickhouse-server:21.3.20
     container_name: clickhouse
     hostname: clickhouse
-    restart: always
     ports:
       - "8123:8123"
       - "9000:9000"
+    volumes:
+      - clickhouse_data:/usr/share/clickhouse
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: 2G
+          cpus: '4'
+          memory: 4G
         reservations:
-          cpus: '2'
-          memory: 2G
+          cpus: '4'
+          memory: 4G
+
+volumes:
+  vertica_data:
+  clickhouse_data:
