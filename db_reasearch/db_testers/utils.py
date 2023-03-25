@@ -7,24 +7,21 @@ from mimesis import Generic
 
 fake = Generic()
 
+logger = logging.getLogger('db_test_logger')
+logger.setLevel(logging.DEBUG)
 
-def get_logger():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('test_results_{}'.format(int(time.time())))
+fh.setLevel(logging.INFO)
+logger.addHandler(fh)
 
-    fh = logging.FileHandler('test_results_{}'.format(int(time.time())))
-    fh.setLevel(logging.INFO)
-    logger.addHandler(fh)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+logger.addHandler(ch)
 
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    logger.addHandler(ch)
-
-    return logger
 
 
 def calculate_average(
-        func: Callable, data: list[list[Any]], logger=get_logger()
+        func: Callable, data: list[list[Any]], logger=logger
 ) -> float:
     """Запускает функцию несколько раз и возвращает среднее время работы.
     Данные, которые возвращала оригинальная функция, при этом игнорируются.

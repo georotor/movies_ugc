@@ -10,13 +10,11 @@ from db_testers.abstract_db_tester import (AbstractInsertTester,
 from db_testers.clickhouse_tester import (ClickHouseInsertTester,
                                           ClickHouseSelectTester)
 from db_testers.utils import (calculate_average, create_users_and_movies_query,
-                              create_users_query, get_logger)
+                              create_users_query, logger)
 from db_testers.vertica_tester import VerticaInsertTester, VerticaSelectTester
 
 RETRIES = 10
 CHUNK_SIZES = [10, 100, 1000, 10000, 100000]
-
-logger = get_logger()
 
 
 class DataBase(enum.Enum):
