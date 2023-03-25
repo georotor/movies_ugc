@@ -60,7 +60,7 @@ class VerticaSelectTester(AbstractSelectTester):
 
         """
         sql = """
-            SELECT timestamp
+            SELECT movie_id, timestamp
             FROM test.views
             WHERE movie_id = :movie_id
             AND user_id = :user_id
