@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime, timezone
 from functools import lru_cache
 
 from aiokafka import AIOKafkaProducer
@@ -23,8 +22,7 @@ class EventHandler:
             await self.producer.send_and_wait(
                 topic=event.topic,
                 key=event.key.encode(),
-                value=event.value.encode(),
-                timestamp_ms=datetime.now(timezone.utc).timestamp()*1000
+                value=event.value.encode()
             )
             res = True
         except KafkaError:

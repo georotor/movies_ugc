@@ -12,6 +12,7 @@ class TransformConsumerRecord:
     async def transform(self, data: list[ConsumerRecord]):
         buf = []
         for msg in data:
+            print(msg)
             buf.append((
                 uuid4(),
                 UUID(msg.key.decode('utf8').split('+')[0]),
