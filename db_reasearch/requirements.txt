@@ -1,0 +1,3 @@
+clickhouse-driver==0.2.5
+mimesis==7.0.0
+vertica-python==1.3.1
