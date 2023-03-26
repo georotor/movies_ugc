@@ -17,20 +17,17 @@ class EventHandler:
         self.producer = producer
 
     async def send(self, event: Event) -> bool:
-        res = False
         try:
-            await self.producer.send_and_wait(
+            await self.producer.send(
                 topic=event.topic,
                 key=event.key.encode(),
                 value=event.value.encode()
             )
-            res = True
+            return True
         except KafkaError:
-            logger.error(f'Ошибка записи в топик {event.topic} сообщения {event.value}', exc_info=True)
-        finally:
-            await self.producer.flush()
+            logger.error(f'Ошибка записи в топик {event.topic} сообщения {event.key}:{event.value}', exc_info=True)
 
-        return res
+        return False
 
 
 @lru_cache()
