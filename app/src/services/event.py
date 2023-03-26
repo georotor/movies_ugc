@@ -2,9 +2,8 @@ import logging
 from datetime import datetime, timezone
 from functools import lru_cache
 
-import backoff
 from aiokafka import AIOKafkaProducer
-from aiokafka.errors import KafkaError, KafkaConnectionError
+from aiokafka.errors import KafkaError
 from fastapi import Depends
 
 from db.kafka import get_kafka
@@ -18,7 +17,6 @@ class EventHandler:
     def __init__(self, producer: AIOKafkaProducer):
         self.producer = producer
 
-    @backoff.on_exception(backoff.expo, (KafkaError, KafkaConnectionError))
     async def send(self, event: Event) -> bool:
         res = False
         try:

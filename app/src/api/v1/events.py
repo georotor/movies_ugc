@@ -20,7 +20,7 @@ async def events(film_id: UUID, timestamp: int, user_id: UUID = Depends(JWTBeare
     event = Event(
         topic='film_views',
         key=f'{user_id}+{film_id}',
-        value=timestamp
+        value=str(timestamp)
     )
 
     return await handler.send(event)

@@ -1,10 +1,13 @@
 from logging import config as logging_config
 
+import backoff
 import uvicorn
 import redis.asyncio as aioredis
 from aiokafka import AIOKafkaProducer
+from aiokafka.errors import KafkaConnectionError
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from redis.exceptions import ConnectionError
 
 from api.v1 import events
 from core.config import settings
@@ -22,6 +25,7 @@ app = FastAPI(
 
 
 @app.on_event("startup")
+@backoff.on_exception(backoff.expo, (KafkaConnectionError, ConnectionError))
 async def startup():
     if settings.jwt_validate:
         redis.client = await aioredis.from_url(
