@@ -1,0 +1,14 @@
+version: '3'
+services:
+
+  etl:
+    build: ./etl
+    environment:
+      - KAFKA_HOST=broker
+      - CLICKHOUSE_HOST=clickhouse-node1
+    networks:
+      - ugc
+
+networks:
+   ugc:
+     name: ugc
