@@ -1,5 +1,7 @@
 # Проектная работа 8 спринта
 
+Репозиторий: https://github.com/georotor/ugc_sprint_1
+
 ## Архитектура
 <details><summary><b>AS IS</b></summary>
 
@@ -13,17 +15,23 @@
 
 </details>
 
+## Выбор хранилища
+[Исследование](https://github.com/georotor/ugc_sprint_1/tree/main/db_reasearch)
+
 ## Описание
 В проекте реализована проверка JWT токена во внешнем сервисе с последующим кэшированием в Redis для снижения нагрузку на Auth сервис.
 Данную проверку можно отключить установив переменную окружения `JWT_VALIDATE=0`, в этом случае JWT токен будет проверяться только на время действия.  
 
 ## Запуск
 Для упрощения compose файлов, запуск проекта разделен на несколько частей:
-- ```commandline
+- брокер Kafka и сервис принимающий данные от клиента:
+  ```commandline
   docker-compose -f docker-compose.yml -f docker-compose.kafka.yml up
   ```
-  запускает брокер Kafka и сервис принимающий данные от клиента
-- ```commandline
+  
+- хранилище ClickHouse и ETL принимающий данные из брокера:
+  ```commandline
   docker-compose -f docker-compose.clickhouse.yml -f docker-compose.etl.yml up
   ```
-  запустит хранилище ClickHouse и ETL принимающий данные из брокера
+
+
