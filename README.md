@@ -16,7 +16,7 @@
 </details>
 
 ## Выбор хранилища
-[Исследование](https://github.com/georotor/ugc_sprint_1/tree/main/db_reasearch)
+[Тестирование производительности БД Vertica и ClickHouse](https://github.com/georotor/ugc_sprint_1/tree/main/db_reasearch)
 
 ## Описание
 В проекте реализована проверка JWT токена во внешнем сервисе с последующим кэшированием в Redis для снижения нагрузку на Auth сервис.
