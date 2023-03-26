@@ -1,13 +1,18 @@
+import logging
 from datetime import datetime, timezone
 from uuid import UUID
 
 import aiohttp
+import backoff
 from fastapi import Request, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jwt import decode
 
 from core.config import settings
 from db import redis
+
+
+logger = logging.getLogger(__name__)
 
 
 class JWTBearer(HTTPBearer):
@@ -41,11 +46,12 @@ class JWTBearer(HTTPBearer):
             payload = decode(token, options={"verify_signature": False})
             if payload.get("exp") > datetime.now(timezone.utc).timestamp():
                 return payload
-        except:
+        except Exception:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token.")
 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Expired token.")
 
+    @backoff.on_exception(backoff.expo, aiohttp.ClientError)
     async def check_auth(self, token: str, payload: dict) -> bool:
         """
         Проверяем валидность в токена во внешнем сервисе и кэшируем результат
@@ -70,10 +76,12 @@ class JWTBearer(HTTPBearer):
             await self._put_jwt_to_cache(payload, res)
             return res
 
-    async def _jwt_from_cache(self, jti: UUID) -> bool:
+    @staticmethod
+    async def _jwt_from_cache(jti: UUID) -> bool:
         return await redis.client.get(str(jti))
 
-    async def _put_jwt_to_cache(self, payload: dict, value: bool):
+    @staticmethod
+    async def _put_jwt_to_cache(payload: dict, value: bool):
         ex = settings.cache_expire
         if payload.get("exp") - datetime.now(timezone.utc).timestamp() < ex:
             ex = payload.get("exp") - datetime.now(timezone.utc).timestamp()
