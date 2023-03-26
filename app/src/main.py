@@ -1,9 +1,9 @@
 from logging import config as logging_config
 
-import redis.asyncio as aioredis
 import uvicorn
+import redis.asyncio as aioredis
 from aiokafka import AIOKafkaProducer
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from api.v1 import events
@@ -23,12 +23,13 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
-    redis.client = await aioredis.from_url(
-        f"redis://{settings.redis_host}:{settings.redis_port}",
-        encoding="utf8",
-        decode_responses=True,
-        max_connections=20,
-    )
+    if settings.jwt_validate:
+        redis.client = await aioredis.from_url(
+            f"redis://{settings.redis_host}:{settings.redis_port}",
+            encoding="utf8",
+            decode_responses=True,
+            max_connections=20,
+        )
     kafka.producer = AIOKafkaProducer(
         bootstrap_servers=f'{settings.kafka_host}:{settings.kafka_port}',
         max_batch_size=1024

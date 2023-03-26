@@ -1,0 +1,4 @@
+aiochclient[aiohttp]==2.2.0
+pydantic==1.10.6
+aiokafka==0.8.0
+backoff==2.2.1
