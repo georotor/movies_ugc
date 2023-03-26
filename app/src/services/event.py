@@ -21,7 +21,6 @@ class EventHandler:
     @backoff.on_exception(backoff.expo, (KafkaError, KafkaConnectionError))
     async def send(self, event: Event) -> bool:
         res = False
-        await self.producer.start()
         try:
             await self.producer.send_and_wait(
                 topic=event.topic,

@@ -30,10 +30,11 @@ async def startup():
             decode_responses=True,
             max_connections=20,
         )
+
     kafka.producer = AIOKafkaProducer(
-        bootstrap_servers=f'{settings.kafka_host}:{settings.kafka_port}',
-        max_batch_size=1024
+        bootstrap_servers=f'{settings.kafka_host}:{settings.kafka_port}'
     )
+    await kafka.producer.start()
 
 
 @app.on_event("shutdown")
