@@ -1,0 +1,28 @@
+version: '3'
+services:
+  api:
+    build: ../../../.
+    image: api-image
+    environment:
+      - KAFKA_HOST=broker
+      - JWT_VALIDATE=0
+    expose:
+      - 8000
+    ports:
+      - 8000:8000
+    networks:
+      - ugc
+
+  tests:
+    image: api-image
+    entrypoint: >
+      sh -c "pip3 install -r tests/functional/requirements.txt
+      && python3 -m pytest tests/functional/src"
+    depends_on:
+      - api
+    networks:
+      - ugc
+
+networks:
+   ugc:
+     name: ugc

@@ -44,6 +44,7 @@ class JWTBearer(HTTPBearer):
         """
         try:
             payload = decode(token, options={"verify_signature": False})
+            sub = UUID(payload.get('sub'))
             if payload.get("exp") > datetime.now(timezone.utc).timestamp():
                 return payload
         except Exception:
