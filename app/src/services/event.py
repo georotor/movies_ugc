@@ -25,7 +25,7 @@ class EventHandler:
             )
             return True
         except KafkaError:
-            logger.error(f'Ошибка записи в топик {event.topic} сообщения {event.key}:{event.value}', exc_info=True)
+            logger.error(f'Failed send message {event.key}:{event.value} in topic {event.topic}', exc_info=True)
 
         return False
 

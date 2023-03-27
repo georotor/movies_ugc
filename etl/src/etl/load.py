@@ -41,5 +41,4 @@ class LoadClickHouse:
             *data,
         )
 
-        logger.info(f"Записано {len(data)} записей в таблицу practix.film_views")
-
+        logger.info(f"Insert {len(data)} rows in table practix.film_views")
