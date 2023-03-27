@@ -12,6 +12,7 @@ class Settings(BaseSettings):
 
     extract_topic: str = 'film_views'
     extract_batch_size: int = 1024
+    extract_wait_msg: int = 10
 
     clickhouse_host: str = 'localhost'
     clickhouse_port: int = 8123

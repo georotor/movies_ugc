@@ -40,5 +40,4 @@ class LoadClickHouse:
             """INSERT INTO practix.film_views(id,user_id,film_id,timestamp,created) VALUES""",
             *data,
         )
-
-        logger.info(f"Insert {len(data)} rows in table practix.film_views")
+        logger.info(f"Insert {len(data)} records in table practix.film_views")
