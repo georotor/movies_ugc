@@ -40,7 +40,7 @@ package "Auth API" as AuthAPI{
     AuthApp <-down- AuthNginx
 }
 
-package "Ugc API" as UgcApi{
+package "Ugc API" as UgcApi #LightGreen {
     component "[Nginx]" as UgcNginx <<Web>>
     component "[FastAPI]" as UgcApp <<Application>>
     component "[Kafka]" as UgcStream <<Streaming>>
